@@ -49,3 +49,47 @@ func (v *Vector) Rotate(angle float64) {
 func (v *Vector) Angle() float64 {
 	return math.Atan2(v[1], v[0])
 }
+
+func CircleCollision(vPos, vVel, cPos Vector, cRad float64) []Vector {
+	E := vPos
+	L := vVel
+	C := cPos
+	r := cRad
+	d := Sub(L, E)
+	f := Sub(E, C)
+	a := Dot(d, d)
+	b := 2 * Dot(f, d)
+	c := Dot(f, f) - r*r
+
+	disc := b*b - 4*a*c
+
+	if disc < 0 {
+		// No intersection
+		return nil
+	}
+
+	disc = math.Sqrt(disc)
+
+	t1 := (-b - disc) / (2 * a)
+	t2 := (-b + disc) / (2 * a)
+
+	c1 := Vector{vPos[0] + d[0]*t1, vPos[1] + d[1]*t1}
+	c2 := Vector{vPos[0] + d[0]*t2, vPos[1] + d[1]*t2}
+
+	t1hit := t1 >= 0 && t1 <= 1
+	t2hit := t2 >= 0 && t2 <= 1
+
+	if t1hit && t2hit {
+		return []Vector{c1, c2}
+	}
+
+	if t1hit && !t2hit {
+		return []Vector{c1}
+	}
+
+	if !t1hit && t2hit {
+		return []Vector{c2}
+	}
+
+	return nil
+}
